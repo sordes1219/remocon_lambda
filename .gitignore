@@ -1,0 +1,5 @@
+*.pyc
+myvenv
+__pycache__
+rootCA.pem
+code.zip
