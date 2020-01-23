@@ -31,13 +31,13 @@ class LaunchRequestHandler(AbstractRequestHandler):
 
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
-        speak_output = "テレビを声で操作します"
+        speak_output = "テレビのリモコンです"
+        reprompt = "テレビをつけたい場合は、テレビをつけて、と言ってください。"
 
         return (
             handler_input.response_builder
                 .speak(speak_output)
-                .ask(speak_output)
-                .ask(speak_output)
+                .ask(reprompt)
                 .response
         )
 
@@ -70,9 +70,6 @@ class RemoteControllIntentHandler(AbstractRequestHandler):
         return ask_utils.is_intent_name("RemoteControllIntent")(handler_input)
 
     def handle(self, handler_input):
-        # type: (HandlerInput) -> Response
-        speak_output = "その操作はできません。もう一度発話してください。"
-
         # slots
         slots = handler_input.request_envelope.request.intent.slots
 
@@ -82,7 +79,6 @@ class RemoteControllIntentHandler(AbstractRequestHandler):
         # create a payload
         if slots["btn"].resolutions.resolutions_per_authority[0].status.code == StatusCode.ER_SUCCESS_MATCH:
             btn_id = slots["btn"].resolutions.resolutions_per_authority[0].values[0].value.id
-            print("btn_id is " + btn_id)
             if btn_id == "001":
                 action_id = "001"
                 payload = {"state":{"desired":{"{}".format(self.device_list[device_id]):{"{}".format(self.function_list[action_id]):1}}}}
@@ -105,7 +101,7 @@ class RemoteControllIntentHandler(AbstractRequestHandler):
         self.myAWSIoTMQTTClient.disconnect()
         logger.debug('disconnect to shadow')
 
-        speak_output = ""
+        speak_output = "ーーーーー"
 
         return (
             handler_input.response_builder
@@ -122,12 +118,13 @@ class HelpIntentHandler(AbstractRequestHandler):
 
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
-        speak_output = "テレビをつけたい場合は、テレビをつけて、のように発話してください。"
+        speak_output = "テレビをつけたい場合は、テレビをつけて、と言ってください。"
+        reprompt = "ボリュームを2段階下げたい時には、ボリュームを２つ下げて、と言ってください。"
 
         return (
             handler_input.response_builder
                 .speak(speak_output)
-                .ask(speak_output)
+                .ask(reprompt)
                 .response
         )
 
