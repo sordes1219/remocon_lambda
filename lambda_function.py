@@ -76,6 +76,9 @@ class RemoteControllIntentHandler(AbstractRequestHandler):
         # device_id
         device_id = "001"
 
+        #
+        speak_output = "ーーーーー"
+
         # create a payload
         if slots["btn"].resolutions.resolutions_per_authority[0].status.code == StatusCode.ER_SUCCESS_MATCH:
             btn_id = slots["btn"].resolutions.resolutions_per_authority[0].values[0].value.id
@@ -91,17 +94,20 @@ class RemoteControllIntentHandler(AbstractRequestHandler):
                     else:
                         payload = {"state":{"desired":{"{}".format(self.device_list[device_id]):{"{}".format(self.function_list[action_id]):1}}}}
 
-        logger.debug(json.dumps(payload))
+            logger.debug(json.dumps(payload))
 
-        # connct to shadow
-        self.myAWSIoTMQTTClient.connect()
-        logger.debug('connect to shadow')
-        self.myAWSIoTMQTTClient.publish(self.topic, json.dumps(payload), 0)
-        logger.debug('update desired')
-        self.myAWSIoTMQTTClient.disconnect()
-        logger.debug('disconnect to shadow')
+            # connct to shadow
+            self.myAWSIoTMQTTClient.connect()
+            logger.debug('connect to shadow')
+            self.myAWSIoTMQTTClient.publish(self.topic, json.dumps(payload), 0)
+            logger.debug('update desired')
+            self.myAWSIoTMQTTClient.disconnect()
+            logger.debug('disconnect to shadow')
 
-        speak_output = "ーーーーー"
+            speak_output = "ーーーーー"
+
+        else:
+            speak_output = "その操作はできません。テレビをつけたい場合は、テレビをつけて、と言ってください。"
 
         return (
             handler_input.response_builder
